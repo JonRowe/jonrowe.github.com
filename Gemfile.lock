@@ -115,3 +115,4 @@ DEPENDENCIES
   middleman
   middleman-gh-pages
   middleman-smusher
+  middleman-sprockets
