@@ -1,1 +1,60 @@
 //= require 'normalize'
+@import "susy"
+
+$total-columns  : 4
+$column-width   : 8em
+$gutter-width   : 1em
+$grid-padding   : $gutter-width
+
+
+body
+  @include container
+
+  ul
+    margin:  0
+
+  a
+    @include span-columns(4)
+    @include omega
+    display: block
+    padding-top:     1em
+    padding-bottom:  1em
+    margin-top:     .5em
+    margin-bottom:  .5em
+    background: black
+    border-radius: .2em
+    cursor: pointer
+    color: white
+    font-weight: bold
+    text-decoration: none
+
+  h1, h2, a
+    text-transform: uppercase
+  h1
+    font-size: 6em
+    position: relative
+    bottom:   -.3em
+  h2
+    font-size: 3.85em
+
+  h1,h2,h3, a
+    text-align: center
+  h1,h2,h3
+    padding: 0
+    margin:  0
+
+
+  @include at-breakpoint(33em 16)
+    @include container
+    max-width: 40em
+    header
+      display: block
+    h1
+      font-size: 15em
+    h2
+      font-size: 9.7em
+    h3
+      font-size: 1.95em
+    a
+      @include span-columns(4)
+      @include nth-omega
