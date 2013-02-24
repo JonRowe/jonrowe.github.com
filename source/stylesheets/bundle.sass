@@ -34,9 +34,23 @@ body
   h1
     font-size: 6em
     position: relative
+    padding-top: 3em
     bottom:   -.3em
   h2
     font-size: 3.85em
+
+  header
+    position: relative
+  #portrait
+    width: 100%
+    background: white
+    text-align: center
+    img
+      height: 12em
+      border-radius: 50%
+      opacity: 0.8
+      position: relative
+      bottom: -2em
 
   h1,h2,h3, nav a, p, a[href^="mailto"], footer
     text-align: center
@@ -58,7 +72,13 @@ body
     max-width: 40em
     header
       display: block
+    #portrait
+      position: absolute
+      z-index: -1
+      img
+        height: 30em
     h1
+      padding-top: .7em
       font-size: 15em
     h2
       font-size: 9.7em
