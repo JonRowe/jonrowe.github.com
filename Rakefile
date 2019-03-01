@@ -67,12 +67,20 @@ task :publish => [:not_dirty, :prepare_git_remote_in_build_dir, :sync, :build] d
   end
 
   cd BUILD_DIR do
-    sh 'git add --all'
-    if /nothing to commit/ =~ `git status`
-      puts "No changes to commit."
-    else
-      sh "git commit -m \"#{message}\""
+    {
+      "jonrowe-dot-co-dot-uk" => "jonrowe.co.uk",
+      "jonrowe-dot-uk" => "jonrowe.uk",
+      "jonrowe-dot-dev" => "jonrowe.dev",
+    }.each do |origin, domain|
+      sh 'git add --all'
+      if /nothing to commit/ =~ `git status`
+        puts "No changes to commit."
+      else
+        sh "echo '#{domain}' > CNAME"
+        sh 'git add CNAME'
+        sh "git commit -m \"#{message}\""
+        sh "git push #{origin} master"
+      end
     end
-    sh "git push origin master"
   end
 end
