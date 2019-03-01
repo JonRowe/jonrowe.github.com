@@ -3,6 +3,14 @@ require 'fileutils'
 PROJECT_ROOT = `git rev-parse --show-toplevel`.strip
 BUILD_DIR    = File.join(PROJECT_ROOT, "build")
 GH_PAGES_REF = File.join(BUILD_DIR, ".git/refs/remotes/origin/master")
+DOMAINS =
+  {
+    "jonrowe-dot-co-dot-uk" => "jonrowe.co.uk",
+    "jonrowe-dot-uk" => "jonrowe.uk",
+    "jonrowe-dot-dev" => "jonrowe.dev",
+  }
+master_repo = "jonrowe-dot-co-dot-uk"
+repos = {}
 
 directory BUILD_DIR
 
@@ -10,23 +18,31 @@ file GH_PAGES_REF => BUILD_DIR do
   repo_url = nil
 
   cd PROJECT_ROOT do
-    repo_url = `git config --get remote.origin.url`.strip
+    DOMAINS.each do |origin, _|
+      repos[origin] = `git config --get remote.#{origin}.url`.strip
+    end
   end
 
   cd BUILD_DIR do
     sh "git init"
-    sh "git remote add origin #{repo_url}"
-    sh "git fetch origin"
-    sh "git checkout master"
+    DOMAINS.each do |origin, _|
+      if `git remote -v` =~ /#{origin}/
+        sh "git remote set-url #{origin} #{repos[origin]}"
+      else
+        sh "git remote add #{origin} #{repos[origin]}"
+      end
+    end
+    sh "git fetch --all"
 
-    if `git branch -r` =~ /master/
+    if `git branch -l` =~ /master/
       sh "git checkout master"
+    elsif `git branch -r` =~ /master/
+      sh "git checkout -b master -t #{master_repo}/master"
     else
       sh "git checkout --orphan master"
       sh "touch index.html"
       sh "git add ."
       sh "git commit -m 'initial master commit'"
-      sh "git push origin master"
     end
   end
 end
@@ -37,8 +53,8 @@ task :prepare_git_remote_in_build_dir => GH_PAGES_REF
 # Fetch upstream changes on master branch
 task :sync do
   cd BUILD_DIR do
-    sh "git fetch origin"
-    sh "git reset --hard origin/master"
+    sh "git fetch --all"
+    sh "git reset --hard #{master_repo}/master"
   end
 end
 
@@ -67,20 +83,21 @@ task :publish => [:not_dirty, :prepare_git_remote_in_build_dir, :sync, :build] d
   end
 
   cd BUILD_DIR do
-    {
-      "jonrowe-dot-co-dot-uk" => "jonrowe.co.uk",
-      "jonrowe-dot-uk" => "jonrowe.uk",
-      "jonrowe-dot-dev" => "jonrowe.dev",
-    }.each do |origin, domain|
+    if /nothing to commit/ =~ `git status`
+      puts "No changes to commit."
+    else
       sh 'git add --all'
-      if /nothing to commit/ =~ `git status`
-        puts "No changes to commit."
-      else
-        sh "echo '#{domain}' > CNAME"
-        sh 'git add CNAME'
-        sh "git commit -m \"#{message}\""
-        sh "git push #{origin} master"
-      end
+      sh "git commit -m \"#{message}\""
+    end
+
+    DOMAINS.each do |origin, domain|
+      sh "git co -b #{origin}-update"
+      sh "echo '#{domain}' > CNAME"
+      sh "git add CNAME"
+      sh "git commit -m \"Set CNAME\" --allow-empty"
+      sh "git push #{origin} #{origin}-update:master --force"
+      sh "git co master"
+      sh "git branch -D #{origin}-update"
     end
   end
 end
