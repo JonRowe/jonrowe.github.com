@@ -2,14 +2,14 @@ require 'fileutils'
 
 PROJECT_ROOT = `git rev-parse --show-toplevel`.strip
 BUILD_DIR    = File.join(PROJECT_ROOT, "build")
-GH_PAGES_REF = File.join(BUILD_DIR, ".git/refs/remotes/origin/master")
+GH_PAGES_REF = File.join(BUILD_DIR, ".git/refs/remotes/origin/main")
 DOMAINS =
   {
     "jonrowe-dot-co-dot-uk" => "jonrowe.co.uk",
     "jonrowe-dot-uk" => "jonrowe.uk",
     "jonrowe-dot-dev" => "jonrowe.dev",
   }
-master_repo = "jonrowe-dot-co-dot-uk"
+main_repo = "jonrowe-dot-co-dot-uk"
 repos = {}
 
 directory BUILD_DIR
@@ -34,15 +34,15 @@ file GH_PAGES_REF => BUILD_DIR do
     end
     sh "git fetch --all"
 
-    if `git branch -l` =~ /master/
-      sh "git checkout master"
-    elsif `git branch -r` =~ /master/
-      sh "git checkout -b master -t #{master_repo}/master"
+    if `git branch -l` =~ /main/
+      sh "git checkout main"
+    elsif `git branch -r` =~ /main/
+      sh "git checkout -b main -t #{main_repo}/main"
     else
-      sh "git checkout --orphan master"
+      sh "git checkout --orphan main"
       sh "touch index.html"
       sh "git add ."
-      sh "git commit -m 'initial master commit'"
+      sh "git commit -m 'initial main commit'"
     end
   end
 end
@@ -50,11 +50,11 @@ end
 # Alias to something meaningful
 task :prepare_git_remote_in_build_dir => GH_PAGES_REF
 
-# Fetch upstream changes on master branch
+# Fetch upstream changes on main branch
 task :sync do
   cd BUILD_DIR do
     sh "git fetch --all"
-    sh "git reset --hard #{master_repo}/master"
+    sh "git reset --hard #{main_repo}/main"
   end
 end
 
@@ -95,8 +95,8 @@ task :publish => [:not_dirty, :prepare_git_remote_in_build_dir, :sync, :build] d
       sh "echo '#{domain}' > CNAME"
       sh "git add CNAME"
       sh "git commit -m \"Set CNAME\" --allow-empty"
-      sh "git push #{origin} #{origin}-update:master --force"
-      sh "git co master"
+      sh "git push #{origin} #{origin}-update:main --force"
+      sh "git co main"
       sh "git branch -D #{origin}-update"
     end
   end
