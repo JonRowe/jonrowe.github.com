@@ -95,6 +95,10 @@ task :publish => [:not_dirty, :prepare_git_remote_in_build_dir, :sync, :build] d
       sh "echo '#{domain}' > CNAME"
       sh "git add CNAME"
       sh "git commit -m \"Set CNAME\" --allow-empty"
+      # Setup webfinger for mastodon redirect
+      sh "echo 'include: [ \"/.well-known\" ]' > _config.yml"
+      sh "git add _config.yml"
+      sh "git commit -m \"Set config\" --allow-empty"
       sh "git push #{origin} #{origin}-update:main --force"
       sh "git co main"
       sh "git branch -D #{origin}-update"
