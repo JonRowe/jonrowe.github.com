@@ -11,5 +11,6 @@ gem 'middleman-sprockets'
 gem 'concurrent-ruby', '1.3.4'
 
 # gems for Ruby 3.4 support
+gem 'base64'
 gem 'bigdecimal'
 gem 'mutex_m'
