@@ -8,7 +8,7 @@ gem 'middleman-imageoptim'
 gem 'middleman-sprockets'
 
 # pin for logger issue
-gem 'concurrent-ruby', '1.3.4'
+gem 'concurrent-ruby', '1.3.7'
 
 # gems for Ruby 3.4 support
 gem 'base64'
